@@ -12,6 +12,6 @@ public interface IAddActivitiesService extends IService<Activities> {
      * 分页展示所有活动
      * @author zzh
      */
-    IPage<Activities> showAllActivities(Integer pageNum, Integer pageSize, String activityName, Integer userId);
+    IPage<Activities> showAllActivities(Integer pageNum, Integer pageSize, String activityName, String type, Integer userId);
 
 }

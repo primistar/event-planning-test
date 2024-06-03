@@ -7,7 +7,7 @@ import com.software.eventplanning.common.Result;
 import com.software.eventplanning.controller.dto.ParticipantsDTO;
 import com.software.eventplanning.entity.ParticipantApplications;
 import com.software.eventplanning.entity.Participants;
-import com.software.eventplanning.service.IActivitiesService;
+import com.software.eventplanning.entity.Users;
 import com.software.eventplanning.service.IParticipantApplicationService;
 import com.software.eventplanning.service.IParticipantService;
 import org.apache.logging.log4j.util.Strings;
@@ -15,11 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/activity/participant")
+@RequestMapping("/participant")
 public class   ParticipantController {
 
     @Resource
@@ -28,8 +29,6 @@ public class   ParticipantController {
     @Autowired
     private IParticipantApplicationService participantAService;
 
-    @Autowired
-    private IActivitiesService  activitiesService;
     /**
      * 分页查询
      *
@@ -39,7 +38,7 @@ public class   ParticipantController {
      * @param role       根据角色查询
      * @return           返回参与者的信息、total：总共的页数、current：当前页数等数据
      */
-    @GetMapping
+    @GetMapping("/page")
     public Result findPage(@RequestParam Integer pageNum,
                            @RequestParam Integer pageSize,
                            @RequestParam Integer activityId,
@@ -108,32 +107,28 @@ public class   ParticipantController {
     }
 
     /**
-     * 处理申请
-     * 通过申请
+     * 处理申请 通过申请
      */
     @PostMapping("/handle/apply")
-    public Result applyApplication(@RequestBody ParticipantApplications participantApplication) {
+    public Result applyApplication(@RequestBody ParticipantApplications participantApplication, HttpServletRequest request) {
+        Users users = (Users) request.getAttribute("users");
+        participantApplication.setUserId(users.getId());
+        participantApplication.setUsername(users.getUsername());
         return Result.success(participantAService.applyApplication(participantApplication));
     }
 
     /**
-     * 处理申请
-     * 拒绝申请
+     * 处理申请 拒绝申请
      */
     @PostMapping("/handle/reject")
-    public Result rejectApplication(@RequestBody ParticipantApplications participantApplication) {
+    public Result rejectApplication(@RequestBody ParticipantApplications participantApplication,HttpServletRequest request) {
+        Users users = (Users) request.getAttribute("users");
+        participantApplication.setUserId(users.getId());
+        participantApplication.setUsername(users.getUsername());
         participantApplication.setState("已拒绝");
         participantAService.updateById(participantApplication);
         return Result.success(participantApplication);
     }
-    /**
-     * 活动参与者追踪活动进度
-     */
-    @GetMapping("/statustrack")
-    @ResponseBody
-    public Result r(@RequestParam Integer activityId) {
-       String status=activitiesService.getactivitystatusbyid(activityId);
-       return Result.success(status);
-    }
+
 
 }

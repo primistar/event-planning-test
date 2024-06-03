@@ -1,9 +1,11 @@
 package com.software.eventplanning.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.software.eventplanning.controller.dto.ParticipantApplicationDTO;
 import com.software.eventplanning.entity.ParticipantApplications;
 import com.software.eventplanning.entity.Participants;
+import com.software.eventplanning.exception.ServiceException;
 import com.software.eventplanning.mapper.ParticipantApplicationMapper;
 import com.software.eventplanning.mapper.ParticipantsMapper;
 import com.software.eventplanning.service.IParticipantApplicationService;
@@ -18,6 +20,11 @@ public class ParticipantApplicationImpl extends ServiceImpl<ParticipantApplicati
 
     @Override
     public ParticipantApplications apply(Integer activityId, Integer userId, String username) {
+        Long count = baseMapper.selectCount(
+                new LambdaQueryWrapper<ParticipantApplications>().eq(ParticipantApplications::getActivityId, activityId).eq(ParticipantApplications::getUserId, userId));
+        if (count > 0) {
+            throw new ServiceException(500, "用户已申请过当前活动了!");
+        }
         ParticipantApplications participantApplications = new ParticipantApplications();
         participantApplications.setActivityId(activityId);
         participantApplications.setUserId(userId);

@@ -13,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/activity/comment")
+@RequestMapping("/comment")
 public class CommentController {
 
     @Resource

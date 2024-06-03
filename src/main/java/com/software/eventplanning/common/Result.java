@@ -10,21 +10,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Result {
+public class Result<T> {
     private Integer code;
     private String msg;
-    private Object data;
+    private T data;
 
 
     public static Result success() {
         return new Result(Constants.CODE_200, "", null);
     }
 
-    public static Result success(String msg, Object data) {
+    public static <T> Result success(String msg, T data) {
         return new Result(Constants.CODE_200, msg, data);
     }
 
-    public static Result success(Object data) {
+    public static <T> Result success(T data) {
         return new Result(Constants.CODE_200, "", data);
     }
 

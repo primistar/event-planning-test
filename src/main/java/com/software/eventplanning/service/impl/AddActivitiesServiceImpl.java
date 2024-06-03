@@ -19,10 +19,7 @@ import com.software.eventplanning.service.ILoginService;
 import com.software.eventplanning.service.IParticipantService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class AddActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activities> implements IAddActivitiesService {
@@ -71,8 +68,18 @@ public class AddActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Acti
 
 
     //展示活动
+
+    /**
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param activityName
+     * @param type 2:我加入的,1:我创建的,0:所有活动
+     * @param userId
+     * @return
+     */
     @Override
-    public IPage<Activities> showAllActivities(Integer pageNum, Integer pageSize, String activityName, Integer userId)
+    public IPage<Activities> showAllActivities(Integer pageNum, Integer pageSize, String activityName, String type, Integer userId)
     {
         IPage<Activities> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Activities> wrapper = new QueryWrapper<>();
@@ -80,12 +87,17 @@ public class AddActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Acti
         wrapper.orderByDesc("activity_id");
         // 根据activityName模糊查询活动
         wrapper.like(Strings.isNotEmpty(activityName), "activity_name", activityName);
+        if ("1".equals(type)) {
+            wrapper.eq(userId != null && userId.intValue() > 0, "created_by", userId);
+        } else if ("2".equals(type)) {
+            wrapper.apply(userId != null && userId.intValue() > 0, " activity_id in (select activity_id from participant_applications where user_id={0} )", userId);
+        }
 
         // 根据userId查询用户已经参加的活动
-        List<Integer> activityIds = participantsMapper.selectActivityIdsByUserId(userId);
+        /*List<Integer> activityIds = participantsMapper.selectActivityIdsByUserId(createUserId);
         for (Integer activityId : activityIds) {
             wrapper.ne("activity_id", activityId);
-        }
+        }*/
 
         return page(page, wrapper);
     }

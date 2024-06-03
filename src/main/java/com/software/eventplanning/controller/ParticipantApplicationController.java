@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user/participant-application")
+@RequestMapping("/participant-application")
 public class ParticipantApplicationController {
 
     @Autowired
@@ -25,8 +25,9 @@ public class ParticipantApplicationController {
     public Result getActivities(@RequestParam Integer pageNum,
                                 @RequestParam Integer pageSize,
                                 @RequestParam(defaultValue = "") String activityName,
-                                @RequestParam Integer userId) {
-        return Result.success(addActivitiesService.showAllActivities(pageNum, pageSize, activityName, userId));
+                                @RequestParam String type,
+                                @RequestParam Integer joinedUserId) {
+        return Result.success(addActivitiesService.showAllActivities(pageNum, pageSize, activityName, type, 0));
     }
 
     @PostMapping("/apply")

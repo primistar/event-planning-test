@@ -1,15 +1,16 @@
 package com.software.eventplanning.server;
 
 import com.software.eventplanning.entity.Client;
+import com.software.eventplanning.mapper.ParticipantsMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
@@ -62,15 +63,6 @@ public class SocketServer {
         sendMessage(client.getUserName(), client.getUserName() + "<--" + message, SYS_USERNAME);
 
         logger.info("客户端:【{}】发送信息:{}", client.getUserName(), message);
-    }
-
-    @OnMessage
-    public void onBinaryMessage(ByteBuffer message) {
-        Client client = getClientBySession(session);
-        if(client != null) {
-            logger.info("客户端:【{}】发送文件", client.getUserName());
-            sendBinaryMessageToAll(message);
-        }
     }
 
     /**
@@ -189,64 +181,5 @@ public class SocketServer {
         for (String userName : persons) {
             sendMessage(fromUsername, message, userName);
         }
-    }
-
-    private Client getClientBySession(Session session) {
-        return socketServers.stream()
-                .filter(client -> client.getSession().getId().equals(session.getId()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public static synchronized void sendBinaryMessageToAll(ByteBuffer message) {
-        socketServers.stream()
-                .filter(client -> !client.getUserName().equals(SYS_USERNAME))
-                .forEach(client -> {
-                    try {
-                        client.getSession().getBasicRemote().sendBinary(message);
-                        logger.info("Server sent binary message to client: [{}]", client.getUserName());
-                    } catch (IOException e) {
-                        logger.error("Failed to send binary message to client: [{}]", client.getUserName(), e);
-                    }
-                });
-    }
-
-    public static synchronized void sendBinaryMessageToMany(ByteBuffer message, List<String> usernames) {
-        socketServers.stream()
-                .filter(client -> usernames.contains(client.getUserName()))
-                .forEach(client -> {
-                    try {
-                        client.getSession().getBasicRemote().sendBinary(message);
-                        logger.info("Server sent binary message to client: [{}]", client.getUserName());
-                    } catch (IOException e) {
-                        logger.error("Failed to send binary message to client: [{}]", client.getUserName(), e);
-                    }
-                });
-    }
-
-    public static synchronized void sendPrivateMessage(String fromUsername, String message, String toUsername) {
-        socketServers.stream()
-                .filter(client -> toUsername.equals(client.getUserName()))
-                .forEach(client -> {
-                    try {
-                        client.getSession().getBasicRemote().sendText(fromUsername + ":" + message);
-                        logger.info("Server sent private message from [{}] to [{}]: {}", fromUsername, toUsername, message);
-                    } catch (IOException e) {
-                        logger.error("Failed to send private message to client: [{}]", toUsername, e);
-                    }
-                });
-    }
-
-    public static synchronized void sendPrivateBinaryMessage(String fromUsername, ByteBuffer message, String toUsername) {
-        socketServers.stream()
-                .filter(client -> toUsername.equals(client.getUserName()))
-                .forEach(client -> {
-                    try {
-                        client.getSession().getBasicRemote().sendBinary(message);
-                        logger.info("Server sent private binary message from [{}] to [{}]", fromUsername, toUsername);
-                    } catch (IOException e) {
-                        logger.error("Failed to send private binary message to client: [{}]", toUsername, e);
-                    }
-                });
     }
 }

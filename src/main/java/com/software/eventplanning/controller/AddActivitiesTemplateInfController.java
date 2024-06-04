@@ -7,6 +7,9 @@ import com.software.eventplanning.controller.dto.ActivitiesTemplateDTO;
 import com.software.eventplanning.entity.Template;
 import com.software.eventplanning.service.IAddActivitiesTemplateInfService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +30,7 @@ public class AddActivitiesTemplateInfController {
         //Integer activityId= activitiesTemplateDTO.getActivityId();
         Integer templateId = activitiesTemplateDTO.getTemplateId();
         if (templateId == null) {
-            return Result.error(CODE_403, "请选择活动类型(户外或者室内),系统异常");
+            return Result.error(CODE_403, "缺少活动ID或活动模板ID,系统异常");
         }
         Integer activitySize = activitiesTemplateDTO.getActivitySize();
         String placePlanToUse = activitiesTemplateDTO.getPlacePlanToUse();

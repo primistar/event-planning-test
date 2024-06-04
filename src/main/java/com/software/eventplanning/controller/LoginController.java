@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.software.eventplanning.common.Constants;
 import com.software.eventplanning.common.Result;
 import com.software.eventplanning.controller.dto.LoginDTO;
+import com.software.eventplanning.entity.Users;
 import com.software.eventplanning.service.ILoginService;
 import com.software.eventplanning.utils.JwtUtil;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class LoginController {
         if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
             return Result.error(Constants.CODE_400, "用户或密码为空");
         }
-        LoginDTO dto = userService.login(loginDTO);
+        Users dto = userService.login(loginDTO);
         String token = JwtUtil.getToken(dto.getUsername());
         return Result.success(token);
     }

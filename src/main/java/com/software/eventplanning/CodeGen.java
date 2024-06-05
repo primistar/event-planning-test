@@ -19,7 +19,7 @@ public class CodeGen {
                 = "jdbc:mysql://127.0.0.1:3307/activityplanning?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT"
                 + "%2B8";
         String userName = "root";
-        String password = "741";
+        String password = "root";
         String projectPath = System.getProperty("user.dir");
         String outputDir = projectPath + "/src/main/java2";
         String outputXmlDir = projectPath + "/src/main/resources/mapper2";
